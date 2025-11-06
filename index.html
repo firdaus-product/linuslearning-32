@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ms-MY">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kemahiran Pemulihan: Tolak 1–100 (Pembelajaran)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { box-sizing: border-box; }
+    .activity-card { min-height: 420px; }
+    .number-card { transition: all .3s ease; cursor: pointer; }
+    .number-card:hover { transform: scale(1.05); }
+
+    /* Petak 100 grid */
+    .grid-100 { display:grid; grid-template-columns: repeat(10, minmax(24px,1fr)); gap:4px; }
+    .cell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; border:1px solid #e5e7eb; border-radius:6px; background:#fff; }
+    .cell.on { background:#dbeafe; border-color:#60a5fa; }
+    .cell.result { background:#dcfce7; border-color:#22c55e; font-weight:700; }
+    @keyframes pop { 0%{transform:scale(.9)} 60%{transform:scale(1.05)} 100%{transform:scale(1)} }
+    .cell.win { background:#bbf7d0 !important; border-color:#16a34a !important; font-weight:700; animation: pop .5s ease; }
+
+    /* mini bars (tidak kritikal tapi cantik) */
+    .bar { height: 36px; border-radius: 10px; }
+    .bar-a { background:#bfdbfe; border:2px solid #60a5fa; }
+    .bar-b { background:#fde68a; border:2px solid #f59e0b; }
+
+    /* shake util (untuk aktiviti lain jika perlu) */
+    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+    .shake{animation:shake .5s ease}
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-full">
+
+  <!-- Info bar -->
+  <div class="bg-yellow-100 border-b-4 border-yellow-300 p-4 shadow-sm sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">📚</span>
+        <span id="info-text" class="text-lg font-semibold text-gray-800">
+          Pilih aktiviti untuk mula belajar tolak!
+        </span>
+      </div>
+      <button id="speak-btn"
+              class="bg-yellow-300 hover:bg-yellow-400 text-yellow-800 font-bold py-2 px-4 rounded-full text-xl transition-colors duration-200"
+              onclick="speakInfo()">
+        🔊
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto p-6">
+    <!-- Activity card -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 activity-card flex items-center justify-center">
+      <div id="activity-content" class="text-center w-full">
+        <div class="py-16">
+          <div class="text-6xl mb-4">➖</div>
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">
+            Operasi Tolak 1–100 (Tanpa Kumpul Semula)
+          </h2>
+          <p class="text-xl text-gray-600 mb-8">
+            Pilih aktiviti di bawah. Ada suara & maklum balas segera.
+          </p>
+          <div class="text-4xl">👇</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity picker -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Pilih Aktiviti</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+        <button onclick="loadActivity(1)"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-lg">
+          🍬 Ambil & Baki
+        </button>
+        <button onclick="loadActivity(2)"
+                class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg text-lg">
+          📉 Garis Nombor Mundur
+        </button>
+        <button onclick="loadActivity(3)"
+                class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-4 rounded-lg text-lg">
+          🟩 Petak 100
+        </button>
+        <button onclick="loadActivity(4)"
+                class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg text-lg">
+          🧮 Bentuk Lazim (Puluh–Sa)
+        </button>
+        <button onclick="loadActivity(5)"
+                class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-4 rounded-lg text-lg">
+          📝 Cerita Harian
+        </button>
+      </div>
+
+      <div class="flex justify-center gap-4">
+        <button onclick="clearActivity()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+          🧹 Bersih
+        </button>
+        <button onclick="nextActivity()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+          ➡️ Seterusnya
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentActivity = 0;
+    let ttsEnabled = false;
+    let currentInfo = "Pilih aktiviti untuk mula belajar tolak!";
+    function setInfo(t){ currentInfo=t; document.getElementById('info-text').textContent=t; }
+
+    /* ====== TTS ====== */
+    function speak(text) {
+      if (!ttsEnabled) return;
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ms-MY'; u.rate = 0.95; u.pitch = 1.03;
+        const vs = speechSynthesis.getVoices();
+        const ms = vs.find(v=>v.lang==='ms-MY'||v.lang?.startsWith('ms')); if(ms) u.voice = ms;
+        speechSynthesis.speak(u);
+      }, 80);
+    }
+    function speakInfo(){
+      if(!ttsEnabled){
+        ttsEnabled = true;
+        const b = document.getElementById('speak-btn');
+        b.classList.add('bg-green-300','hover:bg-green-400');
+        b.classList.remove('bg-yellow-300','hover:bg-yellow-400');
+      }
+      speak(currentInfo);
+    }
+    if('speechSynthesis' in window){
+      setInterval(()=>{ if(speechSynthesis.paused) speechSynthesis.resume(); },1200);
+    }
+
+    /* ====== Router ====== */
+    function loadActivity(n){
+      currentActivity = n;
+      const c = document.getElementById('activity-content');
+      if(n===1) return loadTakeAndLeft(c);
+      if(n===2) return loadNumberlineBack(c);
+      if(n===3) return loadHundredChart(c);
+      if(n===4) return loadColumnNoBorrow(c);
+      if(n===5) return loadStorySubtraction(c);
+    }
+
+    /* ========= 1) Ambil & Baki ========= */
+    function genPair_1digit(){
+      const a = 6 + Math.floor(Math.random()*4); // 6..9
+      const b = 1 + Math.floor(Math.random()*5); // 1..5
+      return b<=a ? [a,b] : genPair_1digit();
+    }
+    function loadTakeAndLeft(c){
+      const [a,b] = genPair_1digit(); const target = a-b;
+      setInfo("Klik/ketik untuk ‘ambil’ objek mengikut nombor yang dibuang.");
+      c.innerHTML = `
+        <h3 class="text-2xl font-bold text-blue-600 mb-2">🍬 Ambil & Baki (Objek Maujud)</h3>
+        <div class="max-w-3xl mx-auto bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
+          <p class="text-lg">Soalan: <span class="font-bold">${a}</span> − <span class="font-bold">${b}</span> = <span id="t-result" class="font-bold text-gray-500">?</span></p>
+          <p class="text-sm text-gray-600 mb-3">Klik ${b} objek untuk “ambil”.</p>
+          <div id="candies" class="flex flex-wrap gap-3 justify-center my-4"></div>
+          <div class="flex items-center justify-center gap-2 mt-2">
+            <button id="t-check" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl">✅ Semak</button>
+            <button id="t-new" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl">🔄 Soalan Baharu</button>
+          </div>
+          <div id="t-fb" class="mt-3 font-semibold"></div>
+        </div>
+      `;
+      const area = document.getElementById('candies');
+      let removed = 0;
+      for(let i=0;i<a;i++){
+        const btn = document.createElement('button');
+        btn.className="number-card bg-white border-2 border-blue-200 rounded-full px-3 py-2 text-2xl";
+        btn.textContent="🍬";
+        btn.onclick = ()=>{
+          if(btn.dataset.off) return;
+          btn.dataset.off="1";
+          btn.textContent="❌"; btn.classList.add('opacity-60'); removed++;
+        };
+        area.appendChild(btn);
+      }
+      document.getElementById('t-check').onclick = ()=>{
+        const baki = a-removed;
+        document.getElementById('t-result').textContent = baki;
+        const fb = document.getElementById('t-fb');
+        const ok = (removed===b && baki===target);
+        if(ok){ fb.className="mt-3 font-semibold text-emerald-700"; fb.textContent=`Betul! Baki ${target}.`; speak(`Betul. ${a} tolak ${b} sama dengan ${target}.`); }
+        else { fb.className="mt-3 font-semibold text-rose-700"; fb.textContent=`Belum tepat. Ambil tepat ${b} objek.`; speak("Belum tepat, cuba lagi."); }
+      };
+      document.getElementById('t-new').onclick = ()=>loadTakeAndLeft(c);
+    }
+
+    /* ========= 2) Garis Nombor Mundur ========= */
+    function genPair_line(){
+      // 2-digit − 1-digit tanpa pinjam: sa >= b
+      const tens = 2 + Math.floor(Math.random()*6);   // 20..79
+      const ones = 2 + Math.floor(Math.random()*8);   // 2..9
+      const a = tens*10 + ones;           // 22..79
+      const b = 1 + Math.floor(Math.random()*ones);   // 1..ones
+      return [a,b];
+    }
+    function loadNumberlineBack(c){
+      const [a,b] = genPair_line(); const target = a-b;
+      setInfo("Gunakan lompatan ke belakang sehingga jumlah lompatan = nombor yang ditolak.");
+      c.innerHTML = `
+        <h3 class="text-2xl font-bold text-green-600 mb-2">📉 Garis Nombor Mundur</h3>
+        <div class="max-w-3xl mx-auto bg-green-50 border-2 border-green-200 rounded-2xl p-4">
+          <p class="text-lg">Soalan: <span class="font-bold">${a}</span> − <span class="font-bold">${b}</span> = <span class="font-bold" id="nl-ans">?</span></p>
+          <div class="my-3 flex gap-2 justify-center">
+            <button id="j1" class="bg-white border rounded px-3 py-2">−1</button>
+            <button id="j2" class="bg-white border rounded px-3 py-2">−2</button>
+            <button id="j5" class="bg-white border rounded px-3 py-2">−5</button>
+            <button id="nl-reset" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded">Reset</button>
+          </div>
+
+          <div class="relative h-24 my-3">
+            <div class="absolute left-8 right-8 top-1/2 -translate-y-1/2 h-1 bg-slate-300"></div>
+            <div class="absolute left-8 right-8 top-[60%] flex justify-between text-sm text-slate-600">
+              <span>0</span><span>${a}</span>
+            </div>
+            <div id="marker" class="absolute top-[35%]" style="left: calc(8% + 84% * ${a/ (a||1)});">
+              <div class="text-2xl">🔵</div>
+              <div class="text-xs text-center">${a}</div>
+            </div>
+          </div>
+
+          <div id="nl-fb" class="mt-2 font-semibold"></div>
+        </div>
+      `;
+      let pos = a, used = 0;
+      function update(){
+        const pct = (pos/(a||1))*84+8; // 8%..92%
+        const m = document.getElementById('marker');
+        m.style.left = pct + "%";
+        m.querySelector('div:nth-child(2)').textContent = pos;
+        document.getElementById('nl-ans').textContent = pos;
+        if(used===b){
+          const ok = (pos===target);
+          const fb = document.getElementById('nl-fb');
+          if(ok){ fb.className="mt-2 font-semibold text-emerald-700"; fb.textContent="Selesai! Jawapan betul."; speak(`${a} tolak ${b} sama dengan ${target}`); }
+        }
+      }
+      function step(k){
+        if(used+k>b){ speak("Terlalu banyak lompatan."); return; }
+        used += k; pos -= k; update();
+      }
+      document.getElementById('j1').onclick=()=>step(1);
+      document.getElementById('j2').onclick=()=>step(2);
+      document.getElementById('j5').onclick=()=>step(5);
+      document.getElementById('nl-reset').onclick=()=>{ pos=a; used=0; update(); };
+      update();
+    }
+
+    /* ========= 3) Petak 100 (dengan auto-efek menang) ========= */
+    function genPair_chart(){
+      // 2-digit − 2-digit tanpa pinjam: puluhA>=puluhB, saA>=saB
+      const pA = 3 + Math.floor(Math.random()*6); // 3..8
+      const sA = 2 + Math.floor(Math.random()*8); // 2..9
+      const pB = Math.floor(Math.random()*(pA+1)); // 0..pA
+      const sB = 1 + Math.floor(Math.random()*sA); // 1..sA
+      const a = pA*10+sA, b = pB*10+sB;
+      if(b===0 || a-b<=0) return genPair_chart();
+      return [a,b,pA,sA,pB,sB];
+    }
+    function loadHundredChart(c){
+      const [a,b,pA,sA,pB,sB] = genPair_chart(); 
+      const target = a-b;
+
+      setInfo("Gunakan −10 (naik satu baris) dan −1 (ke kiri). Bila mendarat tepat, sel terus hijau.");
+      c.innerHTML = `
+        <h3 class="text-2xl font-bold text-purple-600 mb-2">🟩 Petak 100</h3>
+        <div class="max-w-4xl mx-auto bg-purple-50 border-2 border-purple-200 rounded-2xl p-4">
+          <p class="text-lg">Soalan: <span class="font-bold">${a}</span> − <span class="font-bold">${b}</span> = 
+            <span id="hc-ans" class="font-bold text-gray-500">?</span></p>
+          <div class="my-2 flex gap-2 justify-center">
+            <button id="m10" class="bg-white border rounded px-3 py-2">−10</button>
+            <button id="m1"  class="bg-white border rounded px-3 py-2">−1</button>
+            <button id="hc-reset" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded">Reset</button>
+            <button id="hc-new" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded">🔄 Baharu</button>
+          </div>
+          <div id="chart" class="grid-100 mt-3"></div>
+          <div id="hc-fb" class="mt-2 font-semibold"></div>
+        </div>
+      `;
+
+      // bina grid
+      const chart = document.getElementById('chart');
+      for(let i=1;i<=100;i++){
+        const cell = document.createElement('div');
+        cell.className = "cell"; cell.textContent=i; chart.appendChild(cell);
+      }
+      const cells = chart.children;
+      const idx = n => n-1;
+
+      // state
+      let pos = a, used10=0, used1=0, locked=false;
+
+      function paint(){
+        [...cells].forEach(x=>x.classList.remove('on','result','win'));
+        for(let i=1;i<=a;i++) cells[idx(i)].classList.add('on'); // highlight 1..a
+        cells[idx(pos)].classList.add('result');
+        document.getElementById('hc-ans').textContent = pos;
+      }
+
+      function success(){
+        locked = true;
+        cells[idx(pos)].classList.add('win');          // highlight sel betul
+        document.getElementById('m10').disabled = true;
+        document.getElementById('m1').disabled  = true;
+        const fb = document.getElementById('hc-fb');
+        fb.className="mt-2 font-semibold text-emerald-700";
+        fb.textContent = `Tepat! ${a} − ${b} = ${target}.`;
+        speak(`${a} tolak ${b} sama dengan ${target}. Syabas!`);
+      }
+
+      function checkAuto(){
+        if(used10===pB && used1===sB && pos===target && !locked){
+          success();
+        }
+      }
+
+      function move(k){
+        if(locked) return;
+        if(k===10){
+          if(used10>=pB) return; used10++; pos -= 10;
+        }else{
+          if(used1>=sB) return; used1++; pos -= 1;
+        }
+        paint(); checkAuto();
+      }
+
+      // hook
+      document.getElementById('m10').onclick = ()=>move(10);
+      document.getElementById('m1').onclick  = ()=>move(1);
+      document.getElementById('hc-reset').onclick = ()=>{ if(locked) return;
+        pos=a; used10=0; used1=0; paint();
+        document.getElementById('hc-fb').textContent="";
+      };
+      document.getElementById('hc-new').onclick = ()=>loadHundredChart(c);
+
+      // lukis awal
+      paint();
+    }
+
+    /* ========= 4) Bentuk Lazim (Puluh–Sa) ========= */
+    function genPair_column(){
+      const pA = 2 + Math.floor(Math.random()*7); // 2..8
+      const sA = 2 + Math.floor(Math.random()*8);
+      const pB = Math.floor(Math.random()*(pA+1));
+      const sB = 1 + Math.floor(Math.random()*sA);
+      const a = pA*10+sA, b = pB*10+sB;
+      if(a-b<=0) return genPair_column();
+      return [a,b, (pA - pB), (sA - sB)];
+    }
+    function loadColumnNoBorrow(c){
+      const [a,b,pRes,sRes] = genPair_column();
+      setInfo("Isi jawapan pada kolum Puluh dan Sa (tanpa kumpul semula).");
+      c.innerHTML = `
+        <h3 class="text-2xl font-bold text-orange-600 mb-2">🧮 Bentuk Lazim (Tanpa Kumpul Semula)</h3>
+        <div class="max-w-md mx-auto bg-orange-50 border-2 border-orange-200 rounded-2xl p-4">
+          <table class="w-full text-center">
+            <thead><tr class="text-sm text-gray-500"><th>Puluh</th><th>Sa</th></tr></thead>
+            <tbody>
+              <tr class="text-2xl"><td>${Math.floor(a/10)}</td><td>${a%10}</td></tr>
+              <tr class="text-2xl"><td class="border-t-2 border-gray-400">−</td><td class="border-t-2 border-gray-400"></td></tr>
+              <tr class="text-2xl"><td>${Math.floor(b/10)}</td><td>${b%10}</td></tr>
+              <tr><td colspan="2"><div class="h-[2px] bg-gray-700 my-2"></div></td></tr>
+              <tr class="text-2xl">
+                <td><input id="col-p" class="w-16 border rounded text-center py-1" type="number" placeholder="__"></td>
+                <td><input id="col-s" class="w-16 border rounded text-center py-1" type="number" placeholder="__"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mt-4 flex gap-2 justify-center">
+            <button id="col-check" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl">✅ Semak</button>
+            <button id="col-new" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl">🔄 Soalan Baharu</button>
+          </div>
+          <div id="col-fb" class="mt-2 font-semibold"></div>
+        </div>
+      `;
+      document.getElementById('col-check').onclick = ()=>{
+        const p = Number(document.getElementById('col-p').value);
+        const s = Number(document.getElementById('col-s').value);
+        const ok = (p===pRes && s===sRes);
+        const fb = document.getElementById('col-fb');
+        if(ok){ fb.className="mt-2 font-semibold text-emerald-700"; fb.textContent=`Betul! ${a} − ${b} = ${a-b}.`; speak(`Betul. ${a} tolak ${b} sama dengan ${a-b}.`); }
+        else { fb.className="mt-2 font-semibold text-rose-700"; fb.textContent="Semak semula: tolak Sa dahulu, kemudian Puluh."; }
+      };
+      document.getElementById('col-new').onclick = ()=>loadColumnNoBorrow(c);
+    }
+
+    /* ========= 5) Cerita Harian ========= */
+    function loadStorySubtraction(c){
+      const bank = [
+        {img:"✏️", text:(a,b)=>`Ali mempunyai ${a} pensel. Dia memberi ${b} pensel kepada kawan.`, unit:"pensel"},
+        {img:"🍪", text:(a,b)=>`Sara ada ${a} biskut. Dia makan ${b} biskut.`, unit:"biskut"},
+        {img:"📚", text:(a,b)=>`Di rak ada ${a} buku. Adik pinjam ${b} buku.`, unit:"buku"},
+        {img:"⚽", text:(a,b)=>`Dalam kotak ada ${a} bola kecil. Guru ambil ${b} bola.`, unit:"bola"}
+      ];
+      // 2-digit − 1-digit atau 2-digit − 2-digit tanpa pinjam
+      function gen(){
+        const choice = Math.random()<0.5 ? '21' : '22';
+        if(choice==='21'){
+          const tens = 2+Math.floor(Math.random()*7), ones=2+Math.floor(Math.random()*8);
+          const a=tens*10+ones, b=1+Math.floor(Math.random()*ones);
+          return [a,b];
+        }else{
+          const pA=3+Math.floor(Math.random()*6), sA=2+Math.floor(Math.random()*8);
+          const pB=Math.floor(Math.random()*(pA+1)), sB=1+Math.floor(Math.random()*sA);
+          const a=pA*10+sA, b=pB*10+sB; if(a-b<=0) return gen(); return [a,b];
+        }
+      }
+      const [a,b] = gen(); const ans = a-b; const card = bank[Math.floor(Math.random()*bank.length)];
+      setInfo("Tulis ayat matematik & jawapan penuh berdasarkan cerita.");
+      c.innerHTML = `
+        <h3 class="text-2xl font-bold text-rose-600 mb-2">📝 Cerita Harian (Isi Tempat Kosong)</h3>
+        <div class="max-w-3xl mx-auto bg-rose-50 border-2 border-rose-200 rounded-2xl p-4">
+          <div class="flex items-start gap-3">
+            <div class="text-5xl">${card.img}</div>
+            <p id="st-text" class="text-lg">${card.text(a,b)} Berapakah baki ${card.unit}?</p>
+          </div>
+          <div class="mt-4 grid md:grid-cols-3 gap-3">
+            <div class="bg-white rounded-xl p-3 border">
+              <div class="text-sm text-gray-500 mb-1">Ayat Matematik</div>
+              <div class="flex items-center gap-2 justify-center">
+                <input id="st-a" class="w-16 px-2 py-1 border rounded text-center" type="number" placeholder="__">
+                <span class="text-2xl font-bold">−</span>
+                <input id="st-b" class="w-16 px-2 py-1 border rounded text-center" type="number" placeholder="__">
+                <span class="text-2xl font-bold">=</span>
+                <input id="st-s" class="w-20 px-2 py-1 border rounded text-center" type="number" placeholder="__">
+              </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 border">
+              <div class="text-sm text-gray-500 mb-1">Jawapan (ayat penuh)</div>
+              <input id="st-sen" class="w-full px-3 py-2 border rounded" placeholder="Contoh: Baki pensel ialah 34.">
+            </div>
+            <div class="bg-white rounded-xl p-3 border text-center">
+              <div class="text-sm text-gray-500">Tindakan</div>
+              <button id="st-check" class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl w-full">✅ Semak</button>
+              <button id="st-new" class="mt-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl w-full">🔄 Soalan Baharu</button>
+            </div>
+          </div>
+          <div id="st-fb" class="mt-3 font-semibold"></div>
+        </div>
+      `;
+      document.getElementById('st-check').onclick = ()=>{
+        const A=Number(document.getElementById('st-a').value);
+        const B=Number(document.getElementById('st-b').value);
+        const S=Number(document.getElementById('st-s').value);
+        const ok = (A===a && B===b && S===ans);
+        const fb = document.getElementById('st-fb');
+        if(ok){ fb.className="mt-3 font-semibold text-emerald-700"; fb.textContent=`Tepat! ${a} − ${b} = ${ans}.`; speak(`Tepat! ${a} tolak ${b} sama dengan ${ans}.`); }
+        else { fb.className="mt-3 font-semibold text-rose-700"; fb.textContent="Semak semula ayat matematik ikut cerita."; }
+      };
+      document.getElementById('st-new').onclick = ()=>loadStorySubtraction(c);
+    }
+
+    /* ====== Kawalan Umum ====== */
+    function clearActivity(){
+      currentActivity=0;
+      document.getElementById('activity-content').innerHTML = `
+        <div class="text-center py-16">
+          <div class="text-6xl mb-4">➖</div>
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">Operasi Tolak 1–100 (Tanpa Kumpul Semula)</h2>
+          <p class="text-xl text-gray-600 mb-8">Pilih aktiviti di bawah. Ada suara & maklum balas segera.</p>
+          <div class="text-4xl">👇</div>
+        </div>`;
+      setInfo("Pilih aktiviti untuk mula belajar tolak!");
+    }
+    function nextActivity(){
+      if(currentActivity===0) return loadActivity(1);
+      if(currentActivity<5) return loadActivity(currentActivity+1);
+      return loadActivity(1);
+    }
+  </script>
+</body>
+</html>
