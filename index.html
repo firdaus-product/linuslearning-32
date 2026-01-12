@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ms-MY">
+<html lang="ms-MY" class="overflow-hidden overscroll-none">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Matematik Ceria: Operasi Tolak (1-100)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -10,104 +11,226 @@
 
   <style>
     /* --- UI STYLE (MASTER REFERENCE - TEMA HIJAU) --- */
-    body { 
-        font-family: 'Fredoka', sans-serif; 
-        background-color: #f0fdf4; 
-        background-image: radial-gradient(#86efac 2px, transparent 2px); 
-        background-size: 30px 30px; 
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background-color: #f0fdf4;
+      background-image: radial-gradient(#86efac 2px, transparent 2px);
+      background-size: 30px 30px;
     }
-    
-    .game-card { 
-        background: white; 
-        border: 4px solid #475569; 
-        box-shadow: 8px 8px 0px #00000020; 
-        border-radius: 1.5rem; 
-        min-height: 600px; 
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
+
+    .game-card {
+      background: white;
+      border: 4px solid #475569;
+      box-shadow: 8px 8px 0px #00000020;
+      border-radius: 1.5rem;
+      /* min-height: 600px; REMOVED */
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
     }
-    
+
     /* Buttons */
-    .btn-3d { 
-        transition: all 0.1s; 
-        border-bottom-width: 6px; 
-        border-color: rgba(0,0,0,0.2); 
-        transform: translateY(0); 
-        cursor: pointer; 
-        display: inline-block; 
+    .btn-3d {
+      transition: all 0.1s;
+      border-bottom-width: 6px;
+      border-color: rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+      cursor: pointer;
+      display: inline-block;
     }
-    .btn-3d:active:not(:disabled) { transform: translateY(4px); border-bottom-width: 2px; box-shadow: none; }
-    .btn-3d:disabled { opacity: 0.6; cursor: not-allowed; border-bottom-width: 6px; filter: grayscale(100%); }
+
+    .btn-3d:active:not(:disabled) {
+      transform: translateY(4px);
+      border-bottom-width: 2px;
+      box-shadow: none;
+    }
+
+    .btn-3d:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-bottom-width: 6px;
+      filter: grayscale(100%);
+    }
 
     /* Animation */
-    .shake { animation: shake 0.4s ease-in-out; border-color: #ef4444 !important; background-color: #fee2e2 !important; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px) rotate(-5deg); } 75% { transform: translateX(8px) rotate(5deg); } }
+    .shake {
+      animation: shake 0.4s ease-in-out;
+      border-color: #ef4444 !important;
+      background-color: #fee2e2 !important;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-8px) rotate(-5deg);
+      }
+
+      75% {
+        transform: translateX(8px) rotate(5deg);
+      }
+    }
 
     /* --- STYLE KHUSUS TOLAK --- */
-    
+
     /* Petak 100 */
-    .grid-100 { display:grid; grid-template-columns: repeat(10, minmax(28px,1fr)); gap:4px; }
-    .cell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:14px; border:2px solid #cbd5e1; border-radius:6px; background:#fff; font-weight:bold; color:#475569; }
-    .cell.on { background:#dbeafe; border-color:#60a5fa; color:#1e3a8a; }
-    .cell.result { background:#dcfce7; border-color:#22c55e; color:#14532d; transform: scale(1.1); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    .cell.win { background:#4ade80 !important; border-color:#166534 !important; color:white; animation: pop .5s ease; }
-    
-    @keyframes pop { 0%{transform:scale(.9)} 60%{transform:scale(1.1)} 100%{transform:scale(1)} }
+    .grid-100 {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(20px, 1fr));
+      gap: 2px;
+      height: 100%;
+      align-content: center;
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border: 2px solid #cbd5e1;
+      border-radius: 4px;
+      background: #fff;
+      font-weight: bold;
+      color: #475569;
+    }
+
+    .cell.on {
+      background: #dbeafe;
+      border-color: #60a5fa;
+      color: #1e3a8a;
+    }
+
+    .cell.result {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #14532d;
+      transform: scale(1.1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .cell.win {
+      background: #4ade80 !important;
+      border-color: #166534 !important;
+      color: white;
+      animation: pop .5s ease;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(.9)
+      }
+
+      60% {
+        transform: scale(1.1)
+      }
+
+      100% {
+        transform: scale(1)
+      }
+    }
 
     /* Objek Maujud */
-    .candy-btn { transition: all 0.2s; font-size: 2rem; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: white; border: 2px solid #e2e8f0; cursor: pointer; }
-    .candy-btn:hover { transform: scale(1.1); border-color: #3b82f6; }
-    .candy-btn.taken { opacity: 0.4; transform: scale(0.9); background: #f1f5f9; border-color: #cbd5e1; cursor: default; }
+    .candy-btn {
+      transition: all 0.2s;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #e2e8f0;
+      cursor: pointer;
+    }
+
+    .candy-btn:hover {
+      transform: scale(1.1);
+      border-color: #3b82f6;
+    }
+
+    .candy-btn.taken {
+      opacity: 0.4;
+      transform: scale(0.9);
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      cursor: default;
+    }
 
     /* Input Standard */
-    .input-std { border: 3px solid #cbd5e1; border-radius: 12px; padding: 8px; text-align: center; font-weight: bold; font-size: 1.2rem; outline: none; transition: border 0.2s; }
-    .input-std:focus { border-color: #3b82f6; }
+    .input-std {
+      border: 3px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 4px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
 
+    .input-std:focus {
+      border-color: #3b82f6;
+    }
   </style>
 </head>
-<body class="min-h-screen text-slate-800 pb-10">
 
-  <div class="fixed top-4 left-0 right-0 z-50 px-4 pointer-events-none">
-    <div class="max-w-4xl mx-auto bg-green-400 border-4 border-green-600 rounded-full px-6 py-3 shadow-xl flex items-center justify-between pointer-events-auto transform hover:scale-[1.01] transition-transform">
+<body class="h-screen w-screen overflow-hidden text-slate-800 flex flex-col overscroll-none">
+
+  <div class="flex-none p-4 z-50 pointer-events-none w-full">
+    <div
+      class="max-w-4xl mx-auto bg-green-400 border-4 border-green-600 rounded-full px-4 py-2 shadow-xl flex items-center justify-between pointer-events-auto transform hover:scale-[1.01] transition-transform">
       <div class="flex items-center gap-3">
-        <span class="text-3xl animate-bounce">➖</span>
-        <span id="info-text" class="text-xl font-bold text-green-900 leading-none mt-1">Operasi Tolak (1-100)</span>
+        <span class="text-2xl animate-bounce">➖</span>
+        <span id="info-text" class="text-lg font-bold text-green-900 leading-none mt-1">Operasi Tolak (1-100)</span>
       </div>
-      <button id="speak-btn" onclick="speakInfo()" class="bg-white hover:bg-green-50 text-green-600 border-2 border-green-200 rounded-full p-2 transition-colors shadow-sm">🔊</button>
+      <button id="speak-btn" onclick="speakInfo()"
+        class="bg-white hover:bg-green-50 text-green-600 border-2 border-green-200 rounded-full p-2 transition-colors shadow-sm">🔊</button>
     </div>
   </div>
-  <div class="h-24"></div>
 
-  <div class="max-w-6xl mx-auto p-4">
-    
-    <div class="game-card p-8 mb-8">
-        <div id="activity-content" class="w-full relative z-10">
-            <div class="py-10 text-center">
-                <div class="text-8xl mb-6 animate-pulse">📉</div>
-                <h2 class="text-5xl font-bold text-emerald-600 mb-4">Operasi Tolak</h2>
-                <p class="text-2xl text-slate-500 mb-8 font-semibold">Tanpa Kumpul Semula (1-100)</p>
-                <div class="text-4xl animate-bounce">👇</div>
-            </div>
+  <div class="flex-1 w-full max-w-5xl mx-auto p-2 flex flex-col min-h-0">
+
+    <div class="game-card p-4 mb-2 flex-1 w-full">
+      <div id="activity-content"
+        class="w-full relative z-10 flex flex-col items-center justify-center h-full transition-opacity duration-200">
+        <div class="py-10 text-center">
+          <div class="text-8xl mb-6 animate-pulse">📉</div>
+          <h2 class="text-4xl md:text-5xl font-bold text-emerald-600 mb-4">Operasi Tolak</h2>
+          <p class="text-lg text-slate-500 mb-8 font-semibold">Tanpa Kumpul Semula (1-100)</p>
+          <div class="text-4xl animate-bounce">👇</div>
         </div>
+      </div>
     </div>
 
-    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg p-6 border-2 border-white">
-      <h3 class="text-2xl font-bold text-slate-700 mb-4 text-center">🎮 Pilih Aktiviti</h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        <button onclick="loadActivity(1)" class="btn-3d bg-blue-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🍬 Ambil & Baki</button>
-        <button onclick="loadActivity(2)" class="btn-3d bg-green-500 text-white font-bold py-4 px-2 rounded-xl text-lg">📉 Garis Nombor</button>
-        <button onclick="loadActivity(3)" class="btn-3d bg-purple-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🟩 Petak 100</button>
-        <button onclick="loadActivity(4)" class="btn-3d bg-orange-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🧮 Bentuk Lazim</button>
-        <button onclick="loadActivity(5)" class="btn-3d bg-rose-500 text-white font-bold py-4 px-2 rounded-xl text-lg">📝 Cerita Harian</button>
+    <div class="flex-none bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg p-2 border-2 border-white">
+      <h3 class="text-lg font-bold text-slate-700 mb-1 text-center">🎮 Pilih Aktiviti</h3>
+
+      <div class="grid grid-cols-5 gap-2 mb-2">
+        <button onclick="loadActivity(1)"
+          class="btn-3d bg-blue-500 text-white font-bold py-2 rounded-xl text-xs">🍬<br>Ambil</button>
+        <button onclick="loadActivity(2)"
+          class="btn-3d bg-green-500 text-white font-bold py-2 rounded-xl text-xs">📉<br>Garis</button>
+        <button onclick="loadActivity(3)"
+          class="btn-3d bg-purple-500 text-white font-bold py-2 rounded-xl text-xs">🟩<br>Petak</button>
+        <button onclick="loadActivity(4)"
+          class="btn-3d bg-orange-500 text-white font-bold py-2 rounded-xl text-xs">🧮<br>Lazim</button>
+        <button onclick="loadActivity(5)"
+          class="btn-3d bg-rose-500 text-white font-bold py-2 rounded-xl text-xs">📝<br>Cerita</button>
       </div>
 
-      <div class="flex justify-center gap-4 border-t-2 border-slate-100 pt-6">
-        <button onclick="clearActivity()" class="btn-3d bg-slate-400 text-white font-bold py-2 px-6 rounded-full text-lg">🏠 Menu</button>
-        <button onclick="nextActivity()" class="btn-3d bg-indigo-500 text-white font-bold py-2 px-8 rounded-full text-xl">Seterusnya ➡️</button>
+      <div class="flex justify-center gap-4 border-t-2 border-slate-100 pt-2">
+        <button onclick="clearActivity()"
+          class="btn-3d bg-slate-400 text-white font-bold py-1 px-4 rounded-full text-base">🏠 Menu</button>
+        <button onclick="nextActivity()"
+          class="btn-3d bg-indigo-500 text-white font-bold py-1 px-6 rounded-full text-lg">Seterusnya ➡️</button>
       </div>
     </div>
   </div>
@@ -117,26 +240,26 @@
     let currentActivity = 0;
     let ttsEnabled = false;
     let currentInfo = "Pilih aktiviti untuk mula!";
-    
+
     function triggerWin() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }); }
 
-    function speak(text) { 
-        if (!ttsEnabled || !('speechSynthesis' in window)) return; 
-        window.speechSynthesis.cancel(); 
-        const u = new SpeechSynthesisUtterance(text); u.lang = 'ms-MY'; u.rate = 0.95; u.pitch = 1.05; 
-        const ms = window.speechSynthesis.getVoices().find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms')); 
-        if (ms) u.voice = ms; 
-        window.speechSynthesis.speak(u); 
+    function speak(text) {
+      if (!ttsEnabled || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text); u.lang = 'ms-MY'; u.rate = 0.95; u.pitch = 1.05;
+      const ms = window.speechSynthesis.getVoices().find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms'));
+      if (ms) u.voice = ms;
+      window.speechSynthesis.speak(u);
     }
-    
-    function setInfo(text) { 
-        currentInfo = text; const infoEl = document.getElementById('info-text'); 
-        infoEl.style.opacity = 0; setTimeout(() => { infoEl.textContent = text; infoEl.style.opacity = 1; }, 200); 
+
+    function setInfo(text) {
+      currentInfo = text; const infoEl = document.getElementById('info-text');
+      infoEl.style.opacity = 0; setTimeout(() => { infoEl.textContent = text; infoEl.style.opacity = 1; }, 200);
     }
-    
-    function speakInfo() { 
-        if (!ttsEnabled) { ttsEnabled = true; document.getElementById('speak-btn').classList.add('bg-green-100', 'text-green-600'); } 
-        speak(currentInfo); 
+
+    function speakInfo() {
+      if (!ttsEnabled) { ttsEnabled = true; document.getElementById('speak-btn').classList.add('bg-green-100', 'text-green-600'); }
+      speak(currentInfo);
     }
 
     /* --- ROUTER --- */
@@ -145,19 +268,19 @@
       const content = document.getElementById('activity-content');
       content.style.opacity = 0;
       setTimeout(() => {
-          if (n === 1) loadTakeAndLeft(content);
-          if (n === 2) loadNumberlineBack(content);
-          if (n === 3) loadHundredChart(content);
-          if (n === 4) loadColumnNoBorrow(content);
-          if (n === 5) loadStorySubtraction(content);
-          content.style.opacity = 1;
+        if (n === 1) loadTakeAndLeft(content);
+        if (n === 2) loadNumberlineBack(content);
+        if (n === 3) loadHundredChart(content);
+        if (n === 4) loadColumnNoBorrow(content);
+        if (n === 5) loadStorySubtraction(content);
+        content.style.opacity = 1;
       }, 200);
     }
 
     function clearActivity() {
-        currentActivity = 0;
-        document.getElementById('activity-content').innerHTML = `<div class="py-10 text-center"><div class="text-8xl mb-6 animate-pulse">📉</div><h2 class="text-5xl font-bold text-emerald-600 mb-4">Operasi Tolak</h2><p class="text-2xl text-slate-500 mb-8 font-semibold">Tanpa Kumpul Semula (1-100)</p></div>`;
-        setInfo("Pilih aktiviti untuk mula!");
+      currentActivity = 0;
+      document.getElementById('activity-content').innerHTML = `<div class="py-10 text-center"><div class="text-8xl mb-6 animate-pulse">📉</div><h2 class="text-5xl font-bold text-emerald-600 mb-4">Operasi Tolak</h2><p class="text-2xl text-slate-500 mb-8 font-semibold">Tanpa Kumpul Semula (1-100)</p></div>`;
+      setInfo("Pilih aktiviti untuk mula!");
     }
     function nextActivity() { let next = currentActivity + 1; if (next > 5) next = 1; loadActivity(next); }
 
@@ -167,258 +290,266 @@
        ========================================= */
 
     /* 1. Ambil & Baki */
-    function genPair_1digit(){
-      const a = 6 + Math.floor(Math.random()*4); const b = 1 + Math.floor(Math.random()*5); return b<=a ? [a,b] : genPair_1digit();
+    function genPair_1digit() {
+      const a = 6 + Math.floor(Math.random() * 4); const b = 1 + Math.floor(Math.random() * 5); return b <= a ? [a, b] : genPair_1digit();
     }
-    function loadTakeAndLeft(c){
-      const [a,b] = genPair_1digit(); const target = a-b;
+    function loadTakeAndLeft(c) {
+      const [a, b] = genPair_1digit(); const target = a - b;
       setInfo("Klik objek untuk 'ambil' dan kira baki.");
       c.innerHTML = `
-        <h3 class="text-4xl font-bold text-blue-500 mb-6 text-center">🍬 Ambil & Baki</h3>
-        <div class="bg-blue-50 border-4 border-blue-200 rounded-3xl p-8 max-w-3xl mx-auto text-center">
-           <div class="text-2xl font-bold text-slate-700 mb-2">Soalan: ${a} - ${b} = <span id="t-result" class="text-blue-500">?</span></div>
-           <p class="text-slate-500 mb-6">Klik ${b} biji gula-gula untuk buang.</p>
-           
-           <div id="candies" class="flex flex-wrap gap-4 justify-center mb-8"></div>
-           
-           <div class="flex justify-center gap-4">
-              <button id="t-check" class="btn-3d bg-blue-500 text-white font-bold py-3 px-8 rounded-xl text-xl">✅ Semak</button>
-              <button id="t-new" class="btn-3d bg-slate-400 text-white font-bold py-3 px-8 rounded-xl text-xl">🔄 Baru</button>
-           </div>
-           <div id="t-fb" class="mt-4 font-bold text-xl h-8"></div>
-        </div>
-      `;
-      
+        <div class="w-full max-w-3xl text-center flex flex-col h-full overflow-hidden">
+            <h3 class="text-2xl font-bold text-blue-500 mb-2 flex-none">🍬 Ambil & Baki</h3>
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 flex-1 flex flex-col min-h-0 overflow-y-auto w-full">
+               <div class="text-xl font-bold text-slate-700 mb-2 flex-none">Soalan: ${a} - ${b} = <span id="t-result" class="text-blue-500">?</span></div>
+               <p class="text-slate-500 mb-4 flex-none text-sm">Klik ${b} biji gula-gula untuk buang.</p>
+               
+               <div id="candies" class="flex flex-wrap gap-2 justify-center mb-4 overflow-y-auto flex-1 content-start"></div>
+               
+               <div class="flex justify-center gap-2 flex-none">
+                  <button id="t-check" class="btn-3d bg-blue-500 text-white font-bold py-2 px-6 rounded-xl text-lg">✅ Semak</button>
+                  <button id="t-new" class="btn-3d bg-slate-400 text-white font-bold py-2 px-6 rounded-xl text-lg">🔄 Baru</button>
+               </div>
+               <div id="t-fb" class="mt-2 font-bold text-lg h-6 flex-none"></div>
+            </div>
+        </div>`;
+
       const area = document.getElementById('candies');
       let removed = 0;
-      for(let i=0;i<a;i++){
+      for (let i = 0; i < a; i++) {
         const btn = document.createElement('button');
-        btn.className="candy-btn"; btn.textContent="🍬";
-        btn.onclick = ()=>{
-           if(btn.dataset.off) return;
-           btn.dataset.off="1"; btn.textContent="❌"; btn.classList.add('taken'); removed++;
+        btn.className = "candy-btn"; btn.textContent = "🍬";
+        btn.onclick = () => {
+          if (btn.dataset.off) return;
+          btn.dataset.off = "1"; btn.textContent = "❌"; btn.classList.add('taken'); removed++;
         };
         area.appendChild(btn);
       }
 
-      document.getElementById('t-check').onclick = ()=>{
-        const baki = a-removed;
+      document.getElementById('t-check').onclick = () => {
+        const baki = a - removed;
         document.getElementById('t-result').textContent = baki;
         const fb = document.getElementById('t-fb');
-        if(removed===b && baki===target){
-           fb.className="mt-4 font-bold text-xl text-green-600"; fb.textContent=`Betul! Baki ialah ${target}.`; triggerWin(); speak(`Betul. Baki ialah ${target}.`);
+        if (removed === b && baki === target) {
+          fb.className = "mt-4 font-bold text-xl text-green-600"; fb.textContent = `Betul! Baki ialah ${target}.`; triggerWin(); speak(`Betul. Baki ialah ${target}.`);
         } else {
-           fb.className="mt-4 font-bold text-xl text-rose-500"; fb.textContent=`Belum tepat. Sila buang ${b} biji.`; speak("Belum tepat.");
+          fb.className = "mt-4 font-bold text-xl text-rose-500"; fb.textContent = `Belum tepat. Sila buang ${b} biji.`; speak("Belum tepat.");
         }
       };
-      document.getElementById('t-new').onclick = ()=>loadTakeAndLeft(c);
+      document.getElementById('t-new').onclick = () => loadTakeAndLeft(c);
     }
 
     /* 2. Garis Nombor Mundur */
-    function genPair_line(){
-      const tens = 2 + Math.floor(Math.random()*6); const ones = 2 + Math.floor(Math.random()*8);
-      const a = tens*10 + ones; const b = 1 + Math.floor(Math.random()*ones);
-      return [a,b];
+    function genPair_line() {
+      const tens = 2 + Math.floor(Math.random() * 6); const ones = 2 + Math.floor(Math.random() * 8);
+      const a = tens * 10 + ones; const b = 1 + Math.floor(Math.random() * ones);
+      return [a, b];
     }
-    function loadNumberlineBack(c){
-      const [a,b] = genPair_line(); const target = a-b;
+    function loadNumberlineBack(c) {
+      const [a, b] = genPair_line(); const target = a - b;
       setInfo("Lompat ke belakang untuk menolak.");
       c.innerHTML = `
-        <h3 class="text-4xl font-bold text-green-500 mb-6 text-center">📉 Garis Nombor Mundur</h3>
-        <div class="bg-green-50 border-4 border-green-200 rounded-3xl p-8 max-w-3xl mx-auto text-center">
-           <div class="text-2xl font-bold text-slate-700 mb-6">Soalan: ${a} - ${b} = <span id="nl-ans" class="text-green-600">?</span></div>
-           
-           <div class="flex justify-center gap-3 mb-8">
-              <button id="j1" class="btn-3d bg-white text-green-700 border-2 border-green-200 rounded-xl px-4 py-2 font-bold">-1</button>
-              <button id="j2" class="btn-3d bg-white text-green-700 border-2 border-green-200 rounded-xl px-4 py-2 font-bold">-2</button>
-              <button id="j5" class="btn-3d bg-white text-green-700 border-2 border-green-200 rounded-xl px-4 py-2 font-bold">-5</button>
-              <button id="nl-reset" class="btn-3d bg-slate-400 text-white rounded-xl px-4 py-2 font-bold">Reset</button>
-           </div>
+        <div class="w-full max-w-3xl text-center flex flex-col h-full overflow-hidden">
+            <h3 class="text-2xl font-bold text-green-500 mb-2 flex-none">📉 Garis Nombor Mundur</h3>
+            <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 flex-1 flex flex-col min-h-0 w-full justify-center">
+               <div class="text-xl font-bold text-slate-700 mb-4 flex-none">Soalan: ${a} - ${b} = <span id="nl-ans" class="text-green-600">?</span></div>
+               
+               <div class="flex justify-center gap-2 mb-6 flex-none">
+                  <button id="j1" class="btn-3d bg-white text-green-700 border-2 border-green-200 rounded-xl px-3 py-1 font-bold">-1</button>
+                  <button id="j2" class="btn-3d bg-white text-green-700 border-2 border-green-200 rounded-xl px-3 py-1 font-bold">-2</button>
+                  <button id="j5" class="btn-3d bg-white text-green-700 border-2 border-green-200 rounded-xl px-3 py-1 font-bold">-5</button>
+                  <button id="nl-reset" class="btn-3d bg-slate-400 text-white rounded-xl px-3 py-1 font-bold">Reset</button>
+               </div>
 
-           <div class="relative h-32 w-full bg-white rounded-2xl border-2 border-slate-100 shadow-inner mb-4">
-              <div class="absolute left-8 right-8 top-1/2 h-2 bg-slate-300 rounded-full"></div>
-              <div class="absolute left-8 top-[60%] font-bold text-slate-400">0</div>
-              <div class="absolute right-8 top-[60%] font-bold text-slate-400">${a}</div>
-              
-              <div id="marker" class="absolute top-[25%] transition-all duration-500" style="left: calc(8% + 84%);">
-                 <div class="text-4xl filter drop-shadow-md">🐸</div>
-                 <div class="text-sm font-bold text-center bg-green-100 px-2 rounded-md border border-green-300">${a}</div>
-              </div>
-           </div>
-           <div id="nl-fb" class="font-bold text-xl h-8"></div>
-        </div>
-      `;
+               <div class="relative h-24 w-full bg-white rounded-xl border-2 border-slate-100 shadow-inner mb-2 flex-none">
+                  <div class="absolute left-8 right-8 top-1/2 h-2 bg-slate-300 rounded-full"></div>
+                  <div class="absolute left-8 top-[60%] font-bold text-slate-400">0</div>
+                  <div class="absolute right-8 top-[60%] font-bold text-slate-400">${a}</div>
+                  
+                  <div id="marker" class="absolute top-[25%] transition-all duration-500" style="left: calc(8% + 84%);">
+                     <div class="text-3xl filter drop-shadow-md">🐸</div>
+                     <div class="text-xs font-bold text-center bg-green-100 px-1 rounded-md border border-green-300">${a}</div>
+                  </div>
+               </div>
+               <div id="nl-fb" class="font-bold text-lg h-6 flex-none"></div>
+            </div>
+        </div>`;
 
       let pos = a, used = 0;
-      function update(){
-        const pct = (pos/(a||1))*84+8; 
+      function update() {
+        const pct = (pos / (a || 1)) * 84 + 8;
         const m = document.getElementById('marker');
         m.style.left = pct + "%";
         m.querySelector('div:nth-child(2)').textContent = pos;
         document.getElementById('nl-ans').textContent = pos;
-        
-        if(used===b){
-           const ok = (pos===target);
-           const fb = document.getElementById('nl-fb');
-           if(ok){ fb.className="text-green-600"; fb.textContent="Selesai! Jawapan betul."; triggerWin(); speak(`${a} tolak ${b} ialah ${target}`); }
+
+        if (used === b) {
+          const ok = (pos === target);
+          const fb = document.getElementById('nl-fb');
+          if (ok) { fb.className = "text-green-600"; fb.textContent = "Selesai! Jawapan betul."; triggerWin(); speak(`${a} tolak ${b} ialah ${target}`); }
         }
       }
-      function step(k){
-        if(used+k>b){ speak("Terlalu banyak."); return; }
+      function step(k) {
+        if (used + k > b) { speak("Terlalu banyak."); return; }
         used += k; pos -= k; update();
       }
-      document.getElementById('j1').onclick=()=>step(1);
-      document.getElementById('j2').onclick=()=>step(2);
-      document.getElementById('j5').onclick=()=>step(5);
-      document.getElementById('nl-reset').onclick=()=>{ pos=a; used=0; update(); document.getElementById('nl-fb').textContent=""; };
+      document.getElementById('j1').onclick = () => step(1);
+      document.getElementById('j2').onclick = () => step(2);
+      document.getElementById('j5').onclick = () => step(5);
+      document.getElementById('nl-reset').onclick = () => { pos = a; used = 0; update(); document.getElementById('nl-fb').textContent = ""; };
     }
 
     /* 3. Petak 100 */
-    function genPair_chart(){
-      const pA = 3 + Math.floor(Math.random()*6); const sA = 2 + Math.floor(Math.random()*8);
-      const pB = Math.floor(Math.random()*(pA+1)); const sB = 1 + Math.floor(Math.random()*sA);
-      const a = pA*10+sA, b = pB*10+sB; if(b===0 || a-b<=0) return genPair_chart();
-      return [a,b,pA,sA,pB,sB];
+    function genPair_chart() {
+      const pA = 3 + Math.floor(Math.random() * 6); const sA = 2 + Math.floor(Math.random() * 8);
+      const pB = Math.floor(Math.random() * (pA + 1)); const sB = 1 + Math.floor(Math.random() * sA);
+      const a = pA * 10 + sA, b = pB * 10 + sB; if (b === 0 || a - b <= 0) return genPair_chart();
+      return [a, b, pA, sA, pB, sB];
     }
-    function loadHundredChart(c){
-      const [a,b,pA,sA,pB,sB] = genPair_chart(); const target = a-b;
+    function loadHundredChart(c) {
+      const [a, b, pA, sA, pB, sB] = genPair_chart(); const target = a - b;
       setInfo("Gunakan butang -10 dan -1 untuk bergerak di grid.");
       c.innerHTML = `
-        <h3 class="text-4xl font-bold text-purple-500 mb-6 text-center">🟩 Petak 100</h3>
-        <div class="bg-purple-50 border-4 border-purple-200 rounded-3xl p-6 max-w-4xl mx-auto flex flex-col md:flex-row gap-6">
-           <div class="flex-1">
-              <div class="text-2xl font-bold text-slate-700 mb-4 text-center">Soalan: ${a} - ${b} = <span id="hc-ans" class="text-purple-600">?</span></div>
-              <div class="flex flex-wrap gap-2 justify-center mb-4">
-                 <button id="m10" class="btn-3d bg-purple-500 text-white px-4 py-2 rounded-xl font-bold">-10 (Naik)</button>
-                 <button id="m1" class="btn-3d bg-purple-400 text-white px-4 py-2 rounded-xl font-bold">-1 (Kiri)</button>
-                 <button id="hc-reset" class="btn-3d bg-slate-400 text-white px-4 py-2 rounded-xl font-bold">Reset</button>
-              </div>
-              <div id="hc-fb" class="text-center font-bold text-lg h-8"></div>
-              <div class="mt-4 text-center"><button class="text-slate-400 underline font-bold" onclick="loadHundredChart(document.getElementById('activity-content'))">Soalan Baru</button></div>
-           </div>
-           <div class="flex-1">
-              <div id="chart" class="grid-100 bg-white p-2 rounded-xl border-2 border-slate-200 shadow-sm"></div>
-           </div>
-        </div>
-      `;
+        <div class="w-full max-w-5xl mx-auto flex flex-col h-full overflow-hidden text-center">
+            <h3 class="text-xl font-bold text-purple-500 mb-2 flex-none">🟩 Petak 100</h3>
+            <div class="bg-purple-50 border-2 border-purple-200 rounded-2xl p-2 flex-1 flex flex-col md:flex-row gap-4 min-h-0 w-full">
+               <div class="flex-none md:w-1/3 flex flex-col justify-center">
+                  <div class="text-xl font-bold text-slate-700 mb-2 text-center">Soalan: ${a} - ${b} = <span id="hc-ans" class="text-purple-600">?</span></div>
+                  <div class="flex flex-wrap gap-2 justify-center mb-2">
+                     <button id="m10" class="btn-3d bg-purple-500 text-white px-3 py-1 rounded-xl font-bold text-sm">-10 (Naik)</button>
+                     <button id="m1" class="btn-3d bg-purple-400 text-white px-3 py-1 rounded-xl font-bold text-sm">-1 (Kiri)</button>
+                     <button id="hc-reset" class="btn-3d bg-slate-400 text-white px-3 py-1 rounded-xl font-bold text-sm">Reset</button>
+                  </div>
+                  <div id="hc-fb" class="text-center font-bold text-base h-6"></div>
+                  <div class="mt-2 text-center"><button class="text-slate-400 underline font-bold" onclick="loadHundredChart(document.getElementById('activity-content'))">Soalan Baru</button></div>
+               </div>
+               <div class="flex-1 min-h-0 overflow-hidden">
+                  <div id="chart" class="grid-100 bg-white p-1 rounded-xl border-2 border-slate-200 shadow-sm h-full w-full object-contain mx-auto"></div>
+               </div>
+            </div>
+        </div>`;
 
       const chart = document.getElementById('chart');
-      for(let i=1;i<=100;i++){ const cell = document.createElement('div'); cell.className = "cell"; cell.textContent=i; chart.appendChild(cell); }
-      const cells = chart.children; const idx = n => n-1;
-      
-      let pos = a, used10=0, used1=0, locked=false;
-      function paint(){
-        [...cells].forEach(x=>x.classList.remove('on','result','win'));
-        for(let i=1;i<=a;i++) cells[idx(i)].classList.add('on');
+      for (let i = 1; i <= 100; i++) { const cell = document.createElement('div'); cell.className = "cell"; cell.textContent = i; chart.appendChild(cell); }
+      const cells = chart.children; const idx = n => n - 1;
+
+      let pos = a, used10 = 0, used1 = 0, locked = false;
+      function paint() {
+        [...cells].forEach(x => x.classList.remove('on', 'result', 'win'));
+        for (let i = 1; i <= a; i++) cells[idx(i)].classList.add('on');
         cells[idx(pos)].classList.add('result');
         document.getElementById('hc-ans').textContent = pos;
       }
-      function checkAuto(){
-        if(used10===pB && used1===sB && pos===target && !locked){
-           locked = true; cells[idx(pos)].classList.add('win');
-           document.getElementById('hc-fb').textContent = "Tepat Sekali!"; document.getElementById('hc-fb').className = "text-center font-bold text-lg text-green-600";
-           triggerWin(); speak("Tepat sekali!");
+      function checkAuto() {
+        if (used10 === pB && used1 === sB && pos === target && !locked) {
+          locked = true; cells[idx(pos)].classList.add('win');
+          document.getElementById('hc-fb').textContent = "Tepat Sekali!"; document.getElementById('hc-fb').className = "text-center font-bold text-lg text-green-600";
+          triggerWin(); speak("Tepat sekali!");
         }
       }
-      function move(k){
-        if(locked) return;
-        if(k===10){ if(used10>=pB) return; used10++; pos-=10; }
-        else { if(used1>=sB) return; used1++; pos-=1; }
+      function move(k) {
+        if (locked) return;
+        if (k === 10) { if (used10 >= pB) return; used10++; pos -= 10; }
+        else { if (used1 >= sB) return; used1++; pos -= 1; }
         paint(); checkAuto();
       }
-      
-      document.getElementById('m10').onclick = ()=>move(10);
-      document.getElementById('m1').onclick = ()=>move(1);
-      document.getElementById('hc-reset').onclick = ()=>{ if(locked)return; pos=a; used10=0; used1=0; paint(); };
+
+      document.getElementById('m10').onclick = () => move(10);
+      document.getElementById('m1').onclick = () => move(1);
+      document.getElementById('hc-reset').onclick = () => { if (locked) return; pos = a; used10 = 0; used1 = 0; paint(); };
       paint();
     }
 
     /* 4. Bentuk Lazim */
-    function genPair_column(){
-      const pA=2+Math.floor(Math.random()*7); const sA=2+Math.floor(Math.random()*8);
-      const pB=Math.floor(Math.random()*(pA+1)); const sB=1+Math.floor(Math.random()*sA);
-      const a=pA*10+sA, b=pB*10+sB; if(a-b<=0) return genPair_column();
-      return [a,b, (pA-pB), (sA-sB)];
+    function genPair_column() {
+      const pA = 2 + Math.floor(Math.random() * 7); const sA = 2 + Math.floor(Math.random() * 8);
+      const pB = Math.floor(Math.random() * (pA + 1)); const sB = 1 + Math.floor(Math.random() * sA);
+      const a = pA * 10 + sA, b = pB * 10 + sB; if (a - b <= 0) return genPair_column();
+      return [a, b, (pA - pB), (sA - sB)];
     }
-    function loadColumnNoBorrow(c){
-      const [a,b,pRes,sRes] = genPair_column();
+    function loadColumnNoBorrow(c) {
+      const [a, b, pRes, sRes] = genPair_column();
       setInfo("Selesaikan bahagian Sa dahulu, kemudian Puluh.");
       c.innerHTML = `
-        <h3 class="text-4xl font-bold text-orange-500 mb-6 text-center">🧮 Bentuk Lazim</h3>
-        <div class="max-w-md mx-auto bg-orange-50 border-4 border-orange-200 rounded-3xl p-8 text-center">
-           <div class="grid grid-cols-2 gap-2 text-2xl font-bold text-slate-700 mb-2">
-              <div class="text-sm text-slate-400 uppercase">Puluh</div><div class="text-sm text-slate-400 uppercase">Sa</div>
-              <div class="bg-white p-4 rounded-xl border-2 border-slate-200">${Math.floor(a/10)}</div><div class="bg-white p-4 rounded-xl border-2 border-slate-200">${a%10}</div>
-              <div class="flex items-center justify-center text-4xl text-orange-500">-</div><div></div>
-              <div class="bg-white p-4 rounded-xl border-2 border-slate-200">${Math.floor(b/10)}</div><div class="bg-white p-4 rounded-xl border-2 border-slate-200">${b%10}</div>
-           </div>
-           <hr class="border-t-4 border-slate-300 my-4 rounded-full">
-           <div class="grid grid-cols-2 gap-2 mb-6">
-              <input id="col-p" class="input-std py-4 text-2xl" type="number" placeholder="?">
-              <input id="col-s" class="input-std py-4 text-2xl" type="number" placeholder="?">
-           </div>
-           <button id="col-check" class="btn-3d bg-orange-500 text-white font-bold py-3 px-8 rounded-xl text-xl w-full">✅ Semak</button>
-           <div id="col-fb" class="mt-4 font-bold text-lg h-6"></div>
-           <div class="mt-2"><button class="text-slate-400 font-bold underline" onclick="loadColumnNoBorrow(document.getElementById('activity-content'))">Soalan Baru</button></div>
-        </div>
-      `;
-      document.getElementById('col-check').onclick = ()=>{
-         const p = Number(document.getElementById('col-p').value);
-         const s = Number(document.getElementById('col-s').value);
-         const fb = document.getElementById('col-fb');
-         if(p===pRes && s===sRes){
-            fb.textContent = "Betul!"; fb.className = "mt-4 font-bold text-lg text-green-600"; triggerWin(); speak("Betul!");
-         } else {
-            fb.textContent = "Salah. Cuba kira Sa dulu."; fb.className = "mt-4 font-bold text-lg text-rose-500";
-         }
+        <div class="w-full max-w-md mx-auto flex flex-col h-full overflow-hidden text-center">
+            <h3 class="text-xl font-bold text-orange-500 mb-2 flex-none">🧮 Bentuk Lazim</h3>
+            <div class="bg-orange-50 border-2 border-orange-200 rounded-2xl p-4 flex-1 flex flex-col justify-center min-h-0 w-full">
+               <div class="grid grid-cols-2 gap-1 text-xl font-bold text-slate-700 mb-2">
+                  <div class="text-xs text-slate-400 uppercase">Puluh</div><div class="text-xs text-slate-400 uppercase">Sa</div>
+                  <div class="bg-white p-2 rounded-xl border-2 border-slate-200 flex items-center justify-center">${Math.floor(a / 10)}</div><div class="bg-white p-2 rounded-xl border-2 border-slate-200 flex items-center justify-center">${a % 10}</div>
+                  <div class="flex items-center justify-center text-3xl text-orange-500">-</div><div></div>
+                  <div class="bg-white p-2 rounded-xl border-2 border-slate-200 flex items-center justify-center">${Math.floor(b / 10)}</div><div class="bg-white p-2 rounded-xl border-2 border-slate-200 flex items-center justify-center">${b % 10}</div>
+               </div>
+               <hr class="border-t-4 border-slate-300 my-2 rounded-full">
+               <div class="grid grid-cols-2 gap-2 mb-4">
+                  <input id="col-p" class="input-std py-2 text-xl" type="number" placeholder="?">
+                  <input id="col-s" class="input-std py-2 text-xl" type="number" placeholder="?">
+               </div>
+               <div class="flex-none">
+                  <button id="col-check" class="btn-3d bg-orange-500 text-white font-bold py-2 px-6 rounded-xl text-lg w-full">✅ Semak</button>
+                  <div id="col-fb" class="mt-2 font-bold text-lg h-6"></div>
+                  <div class="mt-1"><button class="text-slate-400 font-bold underline" onclick="loadColumnNoBorrow(document.getElementById('activity-content'))">Soalan Baru</button></div>
+               </div>
+            </div>
+        </div>`;
+      document.getElementById('col-check').onclick = () => {
+        const p = Number(document.getElementById('col-p').value);
+        const s = Number(document.getElementById('col-s').value);
+        const fb = document.getElementById('col-fb');
+        if (p === pRes && s === sRes) {
+          fb.textContent = "Betul!"; fb.className = "mt-4 font-bold text-lg text-green-600"; triggerWin(); speak("Betul!");
+        } else {
+          fb.textContent = "Salah. Cuba kira Sa dulu."; fb.className = "mt-4 font-bold text-lg text-rose-500";
+        }
       };
     }
 
     /* 5. Cerita Harian */
-    function loadStorySubtraction(c){
+    function loadStorySubtraction(c) {
       const bank = [
-        {img:"✏️", text:(a,b)=>`Ali mempunyai ${a} pensel. Dia memberi ${b} pensel kepada kawan.`, unit:"pensel"},
-        {img:"🍪", text:(a,b)=>`Sara ada ${a} biskut. Dia makan ${b} biskut.`, unit:"biskut"}
+        { img: "✏️", text: (a, b) => `Ali mempunyai ${a} pensel. Dia memberi ${b} pensel kepada kawan.`, unit: "pensel" },
+        { img: "🍪", text: (a, b) => `Sara ada ${a} biskut. Dia makan ${b} biskut.`, unit: "biskut" }
       ];
-      const a = 20 + Math.floor(Math.random()*30); const b = 5 + Math.floor(Math.random()*10); const ans = a-b;
-      const card = bank[Math.floor(Math.random()*bank.length)];
-      
+      const a = 20 + Math.floor(Math.random() * 30); const b = 5 + Math.floor(Math.random() * 10); const ans = a - b;
+      const card = bank[Math.floor(Math.random() * bank.length)];
+
       setInfo("Isi tempat kosong berdasarkan cerita.");
       c.innerHTML = `
-        <h3 class="text-4xl font-bold text-rose-500 mb-6 text-center">📝 Cerita Harian</h3>
-        <div class="max-w-3xl mx-auto bg-rose-50 border-4 border-rose-200 rounded-3xl p-8">
-           <div class="flex items-start gap-4 mb-6">
-              <div class="text-6xl bg-white p-3 rounded-full shadow-sm">${card.img}</div>
-              <p class="text-xl font-medium text-slate-700 pt-2" id="story-txt">${card.text(a,b)} Berapakah baki ${card.unit}?</p>
-           </div>
-           
-           <div class="bg-white rounded-2xl p-6 border-2 border-rose-100 shadow-sm mb-6">
-              <div class="flex flex-wrap items-center justify-center gap-2 mb-4">
-                 <input id="st-a" class="input-std w-20" type="number">
-                 <span class="text-3xl font-bold text-rose-400">-</span>
-                 <input id="st-b" class="input-std w-20" type="number">
-                 <span class="text-3xl font-bold text-rose-400">=</span>
-                 <input id="st-s" class="input-std w-24 bg-rose-50" type="number" placeholder="Baki">
-              </div>
-              <div class="text-center"><button id="st-check" class="btn-3d bg-rose-500 text-white font-bold py-2 px-8 rounded-xl text-lg">Semak</button></div>
-           </div>
-           <div id="st-fb" class="text-center font-bold text-xl h-8"></div>
-           <div class="text-center mt-2"><button class="text-slate-400 font-bold underline" onclick="loadStorySubtraction(document.getElementById('activity-content'))">Cerita Baru</button></div>
-        </div>
-      `;
-      document.getElementById('st-check').onclick = ()=>{
-         const A=Number(document.getElementById('st-a').value);
-         const B=Number(document.getElementById('st-b').value);
-         const S=Number(document.getElementById('st-s').value);
-         const fb = document.getElementById('st-fb');
-         if(A===a && B===b && S===ans){
-            fb.textContent = "Hebat! Jawapan tepat."; fb.className = "text-center font-bold text-xl text-green-600"; triggerWin(); speak("Hebat!");
-         } else {
-            fb.textContent = "Semak semula ayat matematik."; fb.className = "text-center font-bold text-xl text-rose-500";
-         }
+        <div class="w-full max-w-3xl mx-auto flex flex-col h-full overflow-hidden text-center">
+            <h3 class="text-xl font-bold text-rose-500 mb-2 flex-none">📝 Cerita Harian</h3>
+            <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 flex-1 flex flex-col min-h-0 w-full justify-center">
+               <div class="flex items-center gap-2 mb-4 justify-center bg-white p-2 rounded-xl shadow-sm flex-none">
+                  <div class="text-4xl rounded-full">${card.img}</div>
+                  <p class="text-lg font-medium text-slate-700" id="story-txt">${card.text(a, b)} <br>Berapakah baki ${card.unit}?</p>
+               </div>
+               
+               <div class="bg-white rounded-xl p-4 border-2 border-rose-100 shadow-sm mb-2 flex-none">
+                  <div class="flex flex-wrap items-center justify-center gap-2 mb-4">
+                     <input id="st-a" class="input-std w-16" type="number">
+                     <span class="text-2xl font-bold text-rose-400">-</span>
+                     <input id="st-b" class="input-std w-16" type="number">
+                     <span class="text-2xl font-bold text-rose-400">=</span>
+                     <input id="st-s" class="input-std w-20 bg-rose-50" type="number" placeholder="Baki">
+                  </div>
+                  <div class="text-center"><button id="st-check" class="btn-3d bg-rose-500 text-white font-bold py-2 px-6 rounded-xl text-lg">Semak</button></div>
+               </div>
+               <div id="st-fb" class="text-center font-bold text-lg h-6 flex-none"></div>
+               <div class="text-center mt-2 flex-none"><button class="text-slate-400 font-bold underline" onclick="loadStorySubtraction(document.getElementById('activity-content'))">Cerita Baru</button></div>
+            </div>
+        </div>`;
+      document.getElementById('st-check').onclick = () => {
+        const A = Number(document.getElementById('st-a').value);
+        const B = Number(document.getElementById('st-b').value);
+        const S = Number(document.getElementById('st-s').value);
+        const fb = document.getElementById('st-fb');
+        if (A === a && B === b && S === ans) {
+          fb.textContent = "Hebat! Jawapan tepat."; fb.className = "text-center font-bold text-xl text-green-600"; triggerWin(); speak("Hebat!");
+        } else {
+          fb.textContent = "Semak semula ayat matematik."; fb.className = "text-center font-bold text-xl text-rose-500";
+        }
       }
     }
 
   </script>
 </body>
+
 </html>
